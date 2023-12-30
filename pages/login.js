@@ -4,6 +4,7 @@ import { FcGoogle } from "react-icons/fc";
 import { auth } from "@/firebase/firebase";
 import { useAuth } from "@/firebase/Auth";
 import { useRouter } from "next/router";
+import Loader from "@/components/Loader";
 const provider = new GoogleAuthProvider();
 const LoginForm = () => {
     const [password,setPassword] = useState("")
@@ -32,7 +33,8 @@ const LoginForm = () => {
             router.push('/')
         }
     },[authUser,isLoading])
-    return (
+    return isLoading || (!isLoading&&authUser)?<Loader/>
+    :(
         <main className="flex lg:h-[100vh]">
             <div className="w-full lg:w-[60%] p-8 md:p-14 flex items-center justify-center lg:justify-start">
                 <div className="p-8 w-[600px]">
