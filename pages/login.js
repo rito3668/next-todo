@@ -5,12 +5,18 @@ import { auth } from "@/firebase/firebase";
 import { useAuth } from "@/firebase/Auth";
 import { useRouter } from "next/router";
 import Loader from "@/components/Loader";
+import Link from "next/link";
 const provider = new GoogleAuthProvider();
 const LoginForm = () => {
     const [password,setPassword] = useState("")
     const [email,setEmail] = useState("")
     const router = useRouter()
     const {authUser,isLoading} = useAuth()
+    useEffect(()=>{
+        if(!isLoading && authUser){
+            router.push('/')
+        }
+    },[authUser,isLoading])
     const loginHandler = async()=>{
         if(!email || !password)return
         try {
@@ -41,9 +47,9 @@ const LoginForm = () => {
                     <h1 className="text-6xl font-semibold">Login</h1>
                     <p className="mt-6 ml-1">
                         Don't have an account ?{" "}
-                        <span className="underline hover:text-blue-400 cursor-pointer">
+                        <Link href='/register' className="underline hover:text-blue-400 cursor-pointer">
                             Sign Up
-                        </span>
+                        </Link>
                     </p>
 
                     <div className="bg-black/[0.05] text-white w-full py-4 mt-10 rounded-full transition-transform hover:bg-black/[0.8] active:scale-90 flex justify-center items-center gap-4 cursor-pointer group" onClick={signInWithGoogle}>

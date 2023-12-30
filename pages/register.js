@@ -1,12 +1,23 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { auth } from "../firebase/firebase";
+import { useRouter } from "next/router";
+import Loader from "@/components/Loader";
+import { useAuth } from "@/firebase/Auth";
 import { createUserWithEmailAndPassword, updateProfile ,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
+import Link from "next/link";
 const provider = new GoogleAuthProvider();
 const RegisterForm = () => {
     const [username,setUsername] = useState("")
     const [password,setPassword] = useState("")
+    const {authUser,isLoading,setAuthUser} = useAuth()
     const [email,setEmail] = useState("")
+    const router = useRouter()
+    useEffect(()=>{
+        if(!isLoading && authUser){
+            router.push('/')
+        }
+    },[authUser,isLoading])
     const signupHandler = async()=>{
         if(!email || !password || !username)return
         try{
@@ -14,7 +25,11 @@ const RegisterForm = () => {
            await updateProfile(auth.currentUser,{
             displayName:username
            })
-           console.log(user)
+           setAuthUser({
+                uid:user.uid,
+                email:user.email,
+                username
+           })
         }catch(err){
             console.log(err)
         }
@@ -27,16 +42,17 @@ const RegisterForm = () => {
             console.log(err)
         }
     }
-    return (
+    return isLoading || (!isLoading&&authUser)?<Loader/>
+    :(
         <main className="flex lg:h-[100vh]">
             <div className="w-full lg:w-[60%] p-8 md:p-14 flex items-center justify-center lg:justify-start">
                 <div className="p-8 w-[600px]">
                     <h1 className="text-6xl font-semibold">Sign Up</h1>
                     <p className="mt-6 ml-1">
                         Already have an account ?{" "}
-                        <span className="underline hover:text-blue-400 cursor-pointer">
+                        <Link href='/login' className="underline hover:text-blue-400 cursor-pointer">
                             Login
-                        </span>
+                        </Link>
                     </p>
 
                     <div className="bg-black/[0.05] text-white w-full py-4 mt-10 rounded-full transition-transform hover:bg-black/[0.8] active:scale-90 flex justify-center items-center gap-4 cursor-pointer group" onClick={signInWithGoogle}>
